@@ -37,7 +37,8 @@ class Move
     (rock? && other_move.paper? || other_move.spock?) ||
       (paper? && other_move.scissors? || other_move.lizard?) ||
       (scissors? && other_move.rock? || other_move.spock?) ||
-      (lizard? && other_move.rock? || other_move.scissors?)
+      (lizard? && other_move.rock? || other_move.scissors?) ||
+      (spock? && other_move.paper? || other_move.lizard?)
   end
 
   def to_s
