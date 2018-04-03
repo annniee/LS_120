@@ -112,10 +112,8 @@ class RPSGame
 
   def update_score
     if human.move > computer.move
-      puts "updating human score:"
       human.score += 1
     elsif computer.move < human.move
-      puts "updating computer score:"
       computer.score += 1
     end
   end
