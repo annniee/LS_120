@@ -78,7 +78,7 @@ end
 
 #  Game Orchestration Engine
 class RPSGame
-  WINNING_SCORE = 10
+  WINNING_SCORE = 2
 
   attr_accessor :human, :computer
 
@@ -113,7 +113,7 @@ class RPSGame
   def update_score
     if human.move > computer.move
       human.score += 1
-    elsif computer.move < human.move
+    elsif computer.move > human.move
       computer.score += 1
     end
   end
@@ -121,6 +121,20 @@ class RPSGame
   def display_score
     puts "#{human.name}: #{human.score}"
     puts "#{computer.name}: #{computer.score}"
+  end
+
+  def someone_won?
+    human.score >= WINNING_SCORE || computer.score >= WINNING_SCORE
+  end
+
+  def winner
+    human.name if human.score >= WINNING_SCORE
+    computer.name if computer.score >= WINNING_SCORE
+  end
+
+  def display_final_score
+    display_score
+    puts "#{winner} won this game!"
   end
 
   def play_again?
@@ -135,17 +149,33 @@ class RPSGame
     answer == 'y'
   end
 
-  def play
-    display_welcome_message
+  def reset_score
+    human.score = 0
+    computer.score = 0
+  end
 
+  def game_round
     loop do
       human.choose
-      computer.choose # some other state must be modified
+      computer.choose
       display_moves
       display_winner
       update_score
       display_score
+      if someone_won?
+        display_final_score
+        break
+      end
+    end
+  end
+
+  def play
+    display_welcome_message
+
+    loop do
+      game_round
       break unless play_again?
+      reset_score
     end
 
     display_goodbye_message
