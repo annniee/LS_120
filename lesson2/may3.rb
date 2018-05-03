@@ -256,7 +256,6 @@ module Choosables
     elsif last_move_won?
       add_last_move(choices)
     end
-    binding.pry
     select_move(choices.sample)
   end
 end
