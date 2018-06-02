@@ -30,7 +30,6 @@ class Board
     !!winning_marker
   end
 
-  # returns winning marker or nil
   def winning_marker
     WINNING_LINES.each do |line|
       line_squares = squares.values_at(*line)
