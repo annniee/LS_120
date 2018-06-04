@@ -1,28 +1,13 @@
 class Board
-  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
-                   [1, 4, 7], [2, 5, 8], [3, 6, 9],
-                   [1, 5, 9], [3, 5, 7]]
-  ROW_INITIAL = "  "
-  ROW_LINE = "--"
-  COLUMN_INITIAL = " "
-  COLUMN_LINE = "|"
-  DIAGONAL_INITIAL = " "
-  DIAGONAL1_LINE = "\\"
-  DIAGONAL2_LINE = "/"
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],     # rows
+                   [1, 4, 7], [2, 5, 8], [3, 6, 9],     # columns
+                   [1, 5, 9], [3, 5, 7]]                # diagonals
 
-  attr_accessor :squares, :r1, :r2, :r3, :c1, :c2, :c3, :d1, :d2
+  attr_accessor :squares
 
   def initialize
     @squares = {}
     (1..9).each { |key| @squares[key] = Square.new }
-    @r1 = ROW_INITIAL
-    @r2 = ROW_INITIAL
-    @r3 = ROW_INITIAL
-    @c1 = COLUMN_INITIAL
-    @c2 = COLUMN_INITIAL
-    @c3 = COLUMN_INITIAL
-    @d1 = DIAGONAL_INITIAL
-    @d2 = DIAGONAL_INITIAL
   end
 
   def [](position)
@@ -45,14 +30,6 @@ class Board
     !!winning_marker
   end
 
-  def winning_line
-    WINNING_LINES.each do |line|
-      squares_at_line = squares.values_at(*line)
-      return line if identical?(squares_at_line)
-    end
-    nil
-  end
-
   def winning_marker
     WINNING_LINES.each do |line|
       line_squares = squares.values_at(*line)
@@ -63,64 +40,30 @@ class Board
 
   def reset
     (1..9).each { |key| squares[key] = Square.new }
-    @r1 = ROW_INITIAL
-    @r2 = ROW_INITIAL
-    @r3 = ROW_INITIAL
-    @c1 = COLUMN_INITIAL
-    @c2 = COLUMN_INITIAL
-    @c3 = COLUMN_INITIAL
-    @d1 = DIAGONAL_INITIAL
-    @d2 = DIAGONAL_INITIAL
   end
 
   # rubocop: disable Metrics/AbcSize
   def draw
-    puts "#{d1} #{c1}  |  #{c2}  |  #{c3} #{d2}"
-    puts "#{r1}#{squares[1]}#{r1}|#{r1}#{squares[2]}#{r1}|"\
-         "#{r1}#{squares[3]}#{r1}"
-    puts "  #{c1} #{d1}|  #{c2}  |#{d2} #{c3}"
+    puts '     |     |'
+    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
+    puts '     |     |'
     puts '-----+-----+-----'
-    puts "  #{c1}  |#{d1} #{c2} #{d2}|  #{c3}"
-    puts "#{r2}#{squares[4]}#{r2}|#{r2}#{squares[5]}#{r2}|"\
-         "#{r2}#{squares[6]}#{r2}"
-    puts "  #{c1}  |#{d2} #{c2} #{d1}|  #{c3}"
+    puts '     |     |'
+    puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
+    puts '     |     |'
     puts '-----+-----+-----'
-    puts "  #{c1} #{d2}|  #{c2}  |#{d1} #{c3}"
-    puts "#{r3}#{squares[7]}#{r3}|#{r3}#{squares[8]}#{r3}|"\
-         "#{r3}#{squares[9]}#{r3}"
-    puts "#{d2} #{c1}  |  #{c2}  |  #{c3} #{d1}"
+    puts '     |     |'
+    puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
+    puts '     |     |'
   end
   # rubocop: enable Metrics/AbcSize
-
-  # rubocop:disable Metrics/CyclomaticComplexity, MethodLength
-  def mark_winning_strikeline
-    case winning_line
-    when [1, 2, 3]
-      mark_row_1
-    when [4, 5, 6]
-      mark_row_2
-    when [7, 8, 9]
-      mark_row_3
-    when [1, 4, 7]
-      mark_column_1
-    when [2, 5, 8]
-      mark_column_2
-    when [3, 6, 9]
-      mark_column_3
-    when [1, 5, 9]
-      mark_diagonal_1
-    when [3, 5, 7]
-      mark_diagonal_2
-    end
-  end
-  # rubocop:enable Metrics/CyclomaticComplexity, MethodLength
 
   def at_risk_squares(marker)
     at_risk_squares = []
     WINNING_LINES.each do |line|
-      squares_at_line = @squares.values_at(*line)
-      if unmarked_squares(squares_at_line).size == 1 &&
-         marked_squares(squares_at_line, marker).size == 2
+      line_squares = @squares.values_at(*line)
+      if unmarked_squares(line_squares).size == 1 &&
+         marked_squares(line_squares, marker).size == 2
         at_risk_squares << line.select { |num| squares[num].unmarked? }
       end
     end
@@ -129,49 +72,17 @@ class Board
 
   private
 
-  def identical?(squares_at_line)
-    return false if squares_at_line.any?(&:unmarked?)
-    squares_at_line.map(&:marker).uniq.size == 1
+  def identical?(array_of_squares)
+    return false if array_of_squares.any?(&:unmarked?)
+    array_of_squares.map(&:marker).uniq.size == 1
   end
 
-  def unmarked_squares(squares_at_line)
-    squares_at_line.select(&:unmarked?)
+  def unmarked_squares(array_of_squares)
+    array_of_squares.select(&:unmarked?)
   end
 
-  def marked_squares(squares_at_line, marker)
-    squares_at_line.select { |sq| sq.marker == marker }
-  end
-
-  def mark_row_1
-    self.r1 = ROW_LINE
-  end
-
-  def mark_row_2
-    self.r2 = ROW_LINE
-  end
-
-  def mark_row_3
-    self.r3 = ROW_LINE
-  end
-
-  def mark_column_1
-    self.c1 = COLUMN_LINE
-  end
-
-  def mark_column_2
-    self.c2 = COLUMN_LINE
-  end
-
-  def mark_column_3
-    self.c3 = COLUMN_LINE
-  end
-
-  def mark_diagonal_1
-    self.d1 = DIAGONAL1_LINE
-  end
-
-  def mark_diagonal_2
-    self.d2 = DIAGONAL2_LINE
+  def marked_squares(array_of_squares, marker)
+    array_of_squares.select { |sq| sq.marker == marker }
   end
 end
 
@@ -312,11 +223,7 @@ class TTTGame
 
       game_round
 
-      if board.someone_won?
-        board.mark_winning_strikeline
-        update_score
-      end
-
+      update_score if board.someone_won?
       display_round_result
       break if someone_got_winning_score?
       press_enter_to_continue
@@ -433,14 +340,14 @@ class TTTGame
     end
   end
 
-  def joinor(string_options)
-    case string_options.size
+  def joinor(array_of_strings)
+    case array_of_strings.size
     when 1
-      string_options.first
+      array_of_strings.first
     when 2
-      string_options.join(' and ')
+      array_of_strings.join(' and ')
     else
-      string_options[0..-2].join(', ') + ' and ' + string_options.last.to_s
+      array_of_strings[0..-2].join(', ') + ' and ' + array_of_strings.last.to_s
     end
   end
 
